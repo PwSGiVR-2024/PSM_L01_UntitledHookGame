@@ -8,25 +8,25 @@ using UnityEngine.EventSystems;
 public class GrapplingHook : MonoBehaviour 
 {
     [Header("References")]
-    public SurfCharacter mvmt;
-    public Transform cam;
-    public Transform gunTip;
-    public LayerMask grappleable;
-    public LineRenderer lr;
+    [SerializeField] SurfCharacter mvmt;
+    [SerializeField] Transform cam;
+    [SerializeField] Transform gunTip;
+    [SerializeField] LayerMask grappleable;
+    [SerializeField] LineRenderer lr;
 
     [Header("Grappling")]
-    public float maxGrappleDistance;
-    public float overshootY;
-    public float grappleDelay;
+    [SerializeField] float maxGrappleDistance;
+    [SerializeField] float overshootY;
+    [SerializeField] float grappleDelay;
 
     private Vector3 grapplePoint;
 
     [Header("Cooldown")]
-    public float grapplingCd;
+    [SerializeField] float grapplingCd;
     private float grapplingCdTimer;
 
     [Header("Input")]
-    public KeyCode grappleKey = KeyCode.Mouse3;
+    public KeyCode grappleKey = KeyCode.Mouse2;
 
     private bool grappling;
     void Update()
