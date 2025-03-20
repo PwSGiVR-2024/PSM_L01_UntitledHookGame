@@ -51,10 +51,10 @@ public class GrapplingHook : MonoBehaviour
             return;
         }
         grappling = true;
-        mvmt.frozen = true;
         RaycastHit hit;
         if (Physics.Raycast(cam.position, cam.forward, out hit, maxGrappleDistance, grappleable))
         {
+            mvmt.frozen = true;
             grapplePoint = hit.point;
             Invoke(nameof(ExecuteGrapple), grappleDelay);
         }

@@ -42,7 +42,6 @@ namespace Fragsurf.Movement {
 
 
         public void ProcessMovement (ISurfControllable surfer, MovementConfig config, float deltaTime) {
-            //if (activeGrapple) return;
             if (_surfer.moveData.frozen) {
                 _surfer.moveData.velocity = Vector3.zero;
             }
@@ -477,7 +476,7 @@ namespace Fragsurf.Movement {
             float decel = crouching ? _config.crouchDeceleration : _config.deceleration;
 
             // Only apply friction if the player is grounded
-            if (grounded) {
+            if (grounded && !activeGrapple) {
                 
                 // i honestly have no idea what this does tbh
                 _vel.y = _surfer.moveData.velocity.y;
