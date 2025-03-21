@@ -476,7 +476,7 @@ namespace Fragsurf.Movement {
             float decel = crouching ? _config.crouchDeceleration : _config.deceleration;
 
             // Only apply friction if the player is grounded
-            if (grounded && !activeGrapple) {
+            if (grounded) {
                 
                 // i honestly have no idea what this does tbh
                 _vel.y = _surfer.moveData.velocity.y;
