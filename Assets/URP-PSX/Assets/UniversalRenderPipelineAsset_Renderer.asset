@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-3651830660835139043
+--- !u!114 &-8051374733892476282
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -51,10 +51,10 @@ MonoBehaviour:
     probeSamplingDebugTexture: {fileID: 0}
     probeVolumeBlendStatesCS: {fileID: 0}
   m_RendererFeatures:
-  - {fileID: 5596523900377450784}
-  - {fileID: -3651830660835139043}
-  - {fileID: 2563257330036570046}
-  m_RendererFeatureMap: 2049fbf2d5d8aa4d1da20ab95c1752cdbef7be00f6849223
+  - {fileID: 5154353374510882579}
+  - {fileID: 6208656784342824643}
+  - {fileID: -8051374733892476282}
+  m_RendererFeatureMap: 139f8ece15f18747c3b612537394295686a2c86856c54390
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -80,19 +80,6 @@ MonoBehaviour:
   m_DepthTextureFormat: 0
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 1
---- !u!114 &2563257330036570046
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a17da147615463497e4bd9e04f0dce1, type: 3}
-  m_Name: DitheringRenderFeature
-  m_EditorClassIdentifier: 
-  m_Active: 1
 --- !u!114 &2606515335583478340
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -106,7 +93,7 @@ MonoBehaviour:
   m_Name: Fog
   m_EditorClassIdentifier: 
   m_Active: 1
---- !u!114 &5596523900377450784
+--- !u!114 &5154353374510882579
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -117,6 +104,19 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: df6534dd185a4f18b50629b58de296b6, type: 3}
   m_Name: PixelationRenderFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+--- !u!114 &6208656784342824643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a17da147615463497e4bd9e04f0dce1, type: 3}
+  m_Name: DitheringRenderFeature
   m_EditorClassIdentifier: 
   m_Active: 1
 --- !u!114 &6965443398785072023

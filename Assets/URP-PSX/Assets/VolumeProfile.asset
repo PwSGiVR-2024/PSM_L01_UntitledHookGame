@@ -712,31 +712,31 @@ MonoBehaviour:
   active: 1
   fogDensity:
     m_OverrideState: 1
-    m_Value: 10
+    m_Value: 0.77
   fogDistance:
     m_OverrideState: 1
-    m_Value: 1.8
+    m_Value: 3.2
   fogColor:
     m_OverrideState: 1
-    m_Value: {r: 0, g: 0, b: 0, a: 0}
+    m_Value: {r: 0.066037714, g: 0.009033463, b: 0.009033463, a: 0}
   fogNear:
     m_OverrideState: 1
-    m_Value: 0.6
+    m_Value: 4.3
   fogFar:
     m_OverrideState: 1
-    m_Value: 81.3
+    m_Value: 23.3
   fogAltScale:
     m_OverrideState: 1
     m_Value: 10
   fogThinning:
     m_OverrideState: 1
-    m_Value: 458
+    m_Value: 407
   noiseScale:
     m_OverrideState: 1
-    m_Value: 843
+    m_Value: 219
   noiseStrength:
     m_OverrideState: 1
-    m_Value: 0.027
+    m_Value: 0.038
 --- !u!114 &3423954328862424030
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -895,7 +895,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccf1aba9553839d41ae37dd52e9ebcce, type: 3}
   m_Name: MotionBlur
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   mode:
     m_OverrideState: 1
     m_Value: 0
