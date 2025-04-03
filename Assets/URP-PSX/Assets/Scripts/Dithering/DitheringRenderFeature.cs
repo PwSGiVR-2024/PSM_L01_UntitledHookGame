@@ -14,9 +14,14 @@ namespace PSX
         }
 
         //ScripstableRendererFeature is an abstract class, you need this method
-        public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
+        public override void SetupRenderPasses(ScriptableRenderer renderer, in RenderingData renderingData)
         {
             ditheringPass.Setup(renderer.cameraColorTargetHandle);
+
+        }
+
+        public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
+        {
             renderer.EnqueuePass(ditheringPass);
         }
     }
