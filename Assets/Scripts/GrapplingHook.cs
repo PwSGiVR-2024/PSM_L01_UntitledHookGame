@@ -9,6 +9,7 @@ public class GrapplingHook : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] SurfCharacter mvmt;
+    [SerializeField] Transform player;
     [SerializeField] Transform cam;
     [SerializeField] Transform gunTip;
     [SerializeField] LayerMask grappleable;
@@ -19,6 +20,17 @@ public class GrapplingHook : MonoBehaviour
     [SerializeField] float overshootY;
     [SerializeField] float grappleDelay;
 
+    [Header("Swinging")]
+    [SerializeField] float maxSwingDistance;
+    private Vector3 swingPoint;
+    private SpringJoint joint;
+    [SerializeField] float jointMaxDistance;
+    [SerializeField] float jointMinDistance;
+    [SerializeField] float jointSpring;
+    [SerializeField] float jointDamper;
+    [SerializeField] float jointMassScale;
+    private Vector3 currentGrapplePosition;
+
     private Vector3 grapplePoint;
 
     [Header("Cooldown")]
@@ -27,23 +39,69 @@ public class GrapplingHook : MonoBehaviour
 
     [Header("Input")]
     public KeyCode grappleKey = KeyCode.Mouse2;
+    public KeyCode swingKey = KeyCode.Mouse1;
 
     private bool grappling;
     void Update()
     {
-        if (Input.GetKeyDown(grappleKey)) { 
+        if (Input.GetKeyDown(grappleKey))
+        {
             StartGrapple();
         }
-        if (grapplingCdTimer > 0) {
+        if (grapplingCdTimer > 0)
+        {
             grapplingCdTimer -= Time.deltaTime;
+        }
+        if (Input.GetKeyDown(swingKey)){
+            Debug.Log("swing");
+            StartSwing();
+        }
+        if (Input.GetKeyUp(swingKey)){ 
+            StopSwing();
         }
     }
     void LateUpdate() {
         if (grappling) {
             lr.SetPosition(0, gunTip.position);
         }
+        DrawRope();
     }
+    private void StartSwing() {
+        RaycastHit hit;
+        if (Physics.Raycast(cam.position, cam.forward, out hit, maxSwingDistance, grappleable))
+        {
+            swingPoint = hit.point;
+            Debug.Log("hello?");
+            joint = player.gameObject.AddComponent<SpringJoint>();
+            joint.autoConfigureConnectedAnchor = false;
+            joint.connectedAnchor=swingPoint;
 
+            float distanceFromPoint = Vector3.Distance(player.position, swingPoint);
+
+            // the distance grapple will try to keep from grapple point. 
+            joint.maxDistance = distanceFromPoint * jointMaxDistance;
+            joint.minDistance = distanceFromPoint * jointMinDistance;
+
+            // customize values as you like
+            joint.spring = jointSpring;
+            joint.damper = jointDamper;
+            joint.massScale = jointMassScale;
+
+            lr.positionCount = 2;
+            currentGrapplePosition = gunTip.position;
+        }
+    }
+    void DrawRope() {
+        if (!joint) return;
+        lr.SetPosition(0, gunTip.position);
+        lr.SetPosition(1, swingPoint);
+        currentGrapplePosition = Vector3.Lerp(currentGrapplePosition, swingPoint, Time.deltaTime * 8f);
+    }
+    private void StopSwing()
+    {
+        lr.positionCount = 0;
+        Destroy(joint);
+    }
     // Update is called once per frame
     private void StartGrapple() {
         Debug.Log("hook fired");

@@ -1132,7 +1132,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -1390,6 +1390,75 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1033117298
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2613693251493146161, guid: 541b4b4e788ef424eaeea2dc9e3f8340, type: 3}
+      propertyPath: fogDensity
+      value: 0.97
+      objectReference: {fileID: 0}
+    - target: {fileID: 6337133595487128964, guid: 541b4b4e788ef424eaeea2dc9e3f8340, type: 3}
+      propertyPath: ditherScale
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6337133595487128964, guid: 541b4b4e788ef424eaeea2dc9e3f8340, type: 3}
+      propertyPath: patternIndex
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7957011130945160550, guid: 541b4b4e788ef424eaeea2dc9e3f8340, type: 3}
+      propertyPath: m_Name
+      value: PostEffectController
+      objectReference: {fileID: 0}
+    - target: {fileID: 8762864452295677345, guid: 541b4b4e788ef424eaeea2dc9e3f8340, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.77366036
+      objectReference: {fileID: 0}
+    - target: {fileID: 8762864452295677345, guid: 541b4b4e788ef424eaeea2dc9e3f8340, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 4.441445
+      objectReference: {fileID: 0}
+    - target: {fileID: 8762864452295677345, guid: 541b4b4e788ef424eaeea2dc9e3f8340, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 18.974865
+      objectReference: {fileID: 0}
+    - target: {fileID: 8762864452295677345, guid: 541b4b4e788ef424eaeea2dc9e3f8340, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8762864452295677345, guid: 541b4b4e788ef424eaeea2dc9e3f8340, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8762864452295677345, guid: 541b4b4e788ef424eaeea2dc9e3f8340, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8762864452295677345, guid: 541b4b4e788ef424eaeea2dc9e3f8340, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8762864452295677345, guid: 541b4b4e788ef424eaeea2dc9e3f8340, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8762864452295677345, guid: 541b4b4e788ef424eaeea2dc9e3f8340, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8762864452295677345, guid: 541b4b4e788ef424eaeea2dc9e3f8340, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 541b4b4e788ef424eaeea2dc9e3f8340, type: 3}
 --- !u!1 &1177921756
 GameObject:
   m_ObjectHideFlags: 0
@@ -1591,6 +1660,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mvmt: {fileID: 1303323913}
+  player: {fileID: 1303323916}
   cam: {fileID: 812238466}
   gunTip: {fileID: 1629348281}
   grappleable:
@@ -1600,8 +1670,15 @@ MonoBehaviour:
   maxGrappleDistance: 25
   overshootY: 3
   grappleDelay: 0.1
+  maxSwingDistance: 25
+  jointMaxDistance: 0.8
+  jointMinDistance: 0.25
+  jointSpring: 4.5
+  jointDamper: 7
+  jointMassScale: 4.5
   grapplingCd: 0.25
   grappleKey: 325
+  swingKey: 324
 --- !u!114 &1303323913 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5467285084242854815, guid: a840589249729984398df665ca6e2508, type: 3}
@@ -1625,6 +1702,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9877690760780b441aeafc5ca145fd3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!4 &1303323916 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5467285084242854812, guid: a840589249729984398df665ca6e2508, type: 3}
+  m_PrefabInstance: {fileID: 1959815837}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1499130867
 GameObject:
   m_ObjectHideFlags: 0
@@ -2212,6 +2294,7 @@ PrefabInstance:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 1033117298}
   - {fileID: 410087041}
   - {fileID: 832575519}
   - {fileID: 1025712666}
