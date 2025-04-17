@@ -23,7 +23,7 @@ public class GrapplingHook : MonoBehaviour
     [Header("Swinging")]
     [SerializeField] float maxSwingDistance;
     private Vector3 swingPoint;
-    private SpringJoint joint;
+    private SpringJoint jointG, jointS;
     [SerializeField] float jointMaxDistance;
     [SerializeField] float jointMinDistance;
     [SerializeField] float jointSpring;
@@ -53,7 +53,6 @@ public class GrapplingHook : MonoBehaviour
             grapplingCdTimer -= Time.deltaTime;
         }
         if (Input.GetKeyDown(swingKey)){
-            Debug.Log("swing");
             StartSwing();
         }
         if (Input.GetKeyUp(swingKey)){ 
@@ -70,41 +69,95 @@ public class GrapplingHook : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(cam.position, cam.forward, out hit, maxSwingDistance, grappleable))
         {
+            player.gameObject.GetComponent<Rigidbody>().isKinematic = false;
+            player.gameObject.GetComponent<Rigidbody>().useGravity = true;
+            mvmt.grappling = true;
+            mvmt.enabled = false;
             swingPoint = hit.point;
-            Debug.Log("hello?");
-            joint = player.gameObject.AddComponent<SpringJoint>();
-            joint.autoConfigureConnectedAnchor = false;
-            joint.connectedAnchor=swingPoint;
+            jointS = player.gameObject.AddComponent<SpringJoint>();
+            jointS.autoConfigureConnectedAnchor = false;
+            jointS.connectedAnchor=swingPoint;
+            jointS.enablePreprocessing = false;
 
             float distanceFromPoint = Vector3.Distance(player.position, swingPoint);
 
             // the distance grapple will try to keep from grapple point. 
-            joint.maxDistance = distanceFromPoint * jointMaxDistance;
-            joint.minDistance = distanceFromPoint * jointMinDistance;
+            jointS.maxDistance = distanceFromPoint * jointMaxDistance;
+            jointS.minDistance = distanceFromPoint * jointMinDistance;
 
             // customize values as you like
-            joint.spring = jointSpring;
-            joint.damper = jointDamper;
-            joint.massScale = jointMassScale;
-
+            jointS.spring = jointSpring;
+            jointS.damper = jointDamper;
+            jointS.massScale = jointMassScale;
+            lr.enabled = true;
             lr.positionCount = 2;
             currentGrapplePosition = gunTip.position;
         }
     }
     void DrawRope() {
-        if (!joint) return;
+        if (!jointG&&!jointS) return;
         lr.SetPosition(0, gunTip.position);
         lr.SetPosition(1, swingPoint);
         currentGrapplePosition = Vector3.Lerp(currentGrapplePosition, swingPoint, Time.deltaTime * 8f);
     }
     private void StopSwing()
     {
+        Rigidbody rb = player.gameObject.GetComponent<Rigidbody>();
+        Vector3 tangentDir = (player.position - swingPoint).normalized;
+        Vector3 exitVel = rb.GetPointVelocity(player.position);
+
+        if (jointS != null)
+        {
+            Destroy(jointS);
+            jointS = null;
+        }
+        Debug.Log("Swing exit velocity magn: " + rb.linearVelocity.magnitude);
+        Debug.Log("Swing exit velocity: " + rb.linearVelocity);
+
+
         lr.positionCount = 0;
-        Destroy(joint);
+        mvmt.enabled = false;
+        //mvmt.moveData.velocity = rb.linearVelocity;
+        //mvmt.moveData.origin = player.position;
+        //mvmt.enabled = true;
+        //rb.linearVelocity += (player.position - swingPoint).normalized * 8f;
+        StartCoroutine(ReenableFragsurfAfterSwing(exitVel));
+        //StartCoroutine(ReenableKinematic(0.3f));
+
     }
-    // Update is called once per frame
+    /*IEnumerator ReenableKinematic(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        // Optional: only reenable if grounded or speed is low
+        Rigidbody rb = player.gameObject.GetComponent<Rigidbody>();
+        if (mvmt.enabled)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.isKinematic = true;
+            rb.useGravity = false;
+        }
+    }*/
+    IEnumerator ReenableFragsurfAfterSwing(Vector3 carryOverVelocity)
+    {
+        yield return new WaitForFixedUpdate(); // Wait one physics frame
+        //yield return new WaitForSeconds(0.05f); // Helps avoid snapping
+
+        Rigidbody rb = player.gameObject.GetComponent<Rigidbody>();
+        rb.isKinematic = true;
+        rb.useGravity = false;
+        mvmt.enabled = true;
+        mvmt.grappling = false;
+
+        // Wait a single frame so Fragsurf doesn't glitch
+        yield return null;
+        Debug.Log("Velocity before: " + carryOverVelocity);
+        mvmt.moveData.velocity = carryOverVelocity;
+        Debug.Log("Velocity after: " + mvmt.moveData.velocity);
+
+    }
     private void StartGrapple() {
-        Debug.Log("hook fired");
         if (grapplingCdTimer > 0) {
             return;
         }

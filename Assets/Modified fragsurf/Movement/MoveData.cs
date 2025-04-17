@@ -32,6 +32,7 @@ namespace Fragsurf.Movement {
         public bool crouching = false;
         public bool sprinting = false;
         public bool frozen = false;
+        public bool grappling;
 
         public float slopeLimit = 45f;
 

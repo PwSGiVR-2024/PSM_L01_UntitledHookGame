@@ -69,6 +69,7 @@ namespace Fragsurf.Movement {
         private bool underwater = false;
 
         public bool frozen = false;
+        public bool grappling = false;
 
         ///// Properties /////
 
@@ -154,6 +155,7 @@ namespace Fragsurf.Movement {
             rb = gameObject.GetComponent<Rigidbody> ();
             if (rb == null)
                 rb = gameObject.AddComponent<Rigidbody> ();
+            //rb.interpolation = RigidbodyInterpolation.Interpolate;
 
             allowCrouch = crouchingEnabled;
 
@@ -284,9 +286,9 @@ namespace Fragsurf.Movement {
             _moveData.verticalAxis = Input.GetAxisRaw ("Vertical");
             _moveData.horizontalAxis = Input.GetAxisRaw ("Horizontal");
             _moveData.frozen = frozen;
-
+            _moveData.grappling = grappling;
             //_moveData.sprinting = Input.GetButton ("Sprint");
-            
+
             if (Input.GetButtonDown ("Crouch"))
                 _moveData.crouching = true;
 
