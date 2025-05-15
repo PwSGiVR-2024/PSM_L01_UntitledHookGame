@@ -312,13 +312,13 @@ MonoBehaviour:
     m_Value: 2
   ditherThreshold:
     m_OverrideState: 1
-    m_Value: 5.22
+    m_Value: 1.5
   ditherStrength:
     m_OverrideState: 1
     m_Value: 1
   ditherScale:
     m_OverrideState: 1
-    m_Value: 2
+    m_Value: 0.2
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -712,10 +712,10 @@ MonoBehaviour:
   active: 1
   fogDensity:
     m_OverrideState: 1
-    m_Value: 0.77
+    m_Value: 5.04
   fogDistance:
     m_OverrideState: 1
-    m_Value: 3.2
+    m_Value: 8.7
   fogColor:
     m_OverrideState: 1
     m_Value: {r: 0.066037714, g: 0.009033463, b: 0.009033463, a: 0}
@@ -733,10 +733,10 @@ MonoBehaviour:
     m_Value: 407
   noiseScale:
     m_OverrideState: 1
-    m_Value: 219
+    m_Value: 0
   noiseStrength:
     m_OverrideState: 1
-    m_Value: 0.038
+    m_Value: 0.017
 --- !u!114 &3423954328862424030
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -822,10 +822,10 @@ MonoBehaviour:
     m_Value: 512
   heightPixelation:
     m_OverrideState: 1
-    m_Value: 256
+    m_Value: 512
   colorPrecision:
     m_OverrideState: 1
-    m_Value: 4.6
+    m_Value: 8
 --- !u!114 &5255270021971691587
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -879,9 +879,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81180773991d8724ab7f2d216912b564, type: 3}
   m_Name: ChromaticAberration
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   intensity:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 0
 --- !u!114 &7271919108412998681
 MonoBehaviour:
