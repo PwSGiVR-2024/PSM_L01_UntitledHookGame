@@ -42,7 +42,6 @@ namespace Fragsurf.Movement {
 
 
         public void ProcessMovement (ISurfControllable surfer, MovementConfig config, float deltaTime) {
-            Debug.Log(_surfer.moveData.velocity);
             if (_surfer.moveData.frozen)
             {
                 _surfer.moveData.velocity = Vector3.zero;
