@@ -211,7 +211,7 @@ namespace Fragsurf.Movement {
             _moveData.crouchingHeight = crouchingHeightMultiplier;
             _moveData.crouchingSpeed = crouchingSpeed;
             
-            _collider.isTrigger = !solidCollider;
+            _collider.isTrigger = false;
             _moveData.origin = transform.position;
             _startPosition = transform.position;
 

@@ -5,7 +5,7 @@ using Fragsurf.Movement;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.EventSystems;
 
-public class GrapplingHook : MonoBehaviour 
+public class GrapplingHook : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] SurfCharacter mvmt;
@@ -19,17 +19,22 @@ public class GrapplingHook : MonoBehaviour
     [SerializeField] float maxGrappleDistance;
     [SerializeField] float overshootY;
     [SerializeField] float grappleDelay;
+    [SerializeField] float groundedGrappleForce = 25f; // Increased from 15f
 
     [Header("Swinging")]
     [SerializeField] float maxSwingDistance;
     private Vector3 swingPoint;
     private SpringJoint jointG, jointS;
-    [SerializeField] float jointMaxDistance;
-    [SerializeField] float jointMinDistance;
-    [SerializeField] float jointSpring;
-    [SerializeField] float jointDamper;
-    [SerializeField] float jointMassScale;
+    [SerializeField] float jointMaxDistance = 0.9f; // Reduced from 0.8
+    [SerializeField] float jointMinDistance = 0.1f; // Reduced from 0.25
+    [SerializeField] float jointSpring = 15f; // Reduced from 20
+    [SerializeField] float jointDamper = 5f; // Increased from 3
+    [SerializeField] float jointMassScale = 1f; // Drastically reduced from 8
     private Vector3 currentGrapplePosition;
+
+    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private float groundCheckRadius = 0.3f;
+    [SerializeField] private Transform groundCheckPoint;
 
     private Vector3 grapplePoint;
 
@@ -42,6 +47,28 @@ public class GrapplingHook : MonoBehaviour
     public KeyCode swingKey = KeyCode.Mouse1;
 
     private bool grappling;
+    private bool swinging;
+    private Rigidbody playerRb;
+    private bool wasKinematic;
+    private bool wasUsingGravity;
+    private Vector3 preGrappleVelocity; // Store velocity before grapple
+
+    void Start()
+    {
+        // Don't get the rigidbody here - it might not exist yet
+        // We'll get it when we need it
+    }
+
+    // Helper method to safely get the rigidbody
+    private Rigidbody GetPlayerRigidbody()
+    {
+        if (playerRb == null)
+        {
+            playerRb = player.GetComponent<Rigidbody>();
+        }
+        return playerRb;
+    }
+
     void Update()
     {
         if (Input.GetKeyDown(grappleKey))
@@ -52,154 +79,288 @@ public class GrapplingHook : MonoBehaviour
         {
             grapplingCdTimer -= Time.deltaTime;
         }
-        if (Input.GetKeyDown(swingKey)){
+        if (Input.GetKeyDown(swingKey))
+        {
             StartSwing();
         }
-        if (Input.GetKeyUp(swingKey)){ 
+        if (Input.GetKeyUp(swingKey))
+        {
             StopSwing();
         }
     }
-    void LateUpdate() {
-        if (grappling) {
+
+    void LateUpdate()
+    {
+        if (grappling && lr.positionCount > 1)
+        {
             lr.SetPosition(0, gunTip.position);
         }
         DrawRope();
     }
-    private void StartSwing() {
+
+    private void StartSwing()
+    {
+        if (swinging) return; // Prevent multiple swings
+
+        // Safely get the rigidbody
+        Rigidbody rb = GetPlayerRigidbody();
+        if (rb == null)
+        {
+            Debug.LogError("Cannot swing: No Rigidbody found on player!");
+            return;
+        }
+
         RaycastHit hit;
         if (Physics.Raycast(cam.position, cam.forward, out hit, maxSwingDistance, grappleable))
         {
-            player.gameObject.GetComponent<Rigidbody>().isKinematic = false;
-            player.gameObject.GetComponent<Rigidbody>().useGravity = true;
+            swinging = true;
+
+            // Store original rigidbody state
+            wasKinematic = rb.isKinematic;
+            wasUsingGravity = rb.useGravity;
+
+            // Store current Fragsurf velocity before switching to physics
+            Vector3 fragsurfVelocity = mvmt.moveData.velocity;
+
+            // Enable physics for swinging
+            rb.isKinematic = false;
+            rb.useGravity = true;
+
+            // Apply the Fragsurf velocity to the rigidbody BEFORE disabling movement
+            rb.linearVelocity = fragsurfVelocity;
+
+            // Disable Fragsurf movement
             mvmt.grappling = true;
             mvmt.enabled = false;
+
             swingPoint = hit.point;
             jointS = player.gameObject.AddComponent<SpringJoint>();
             jointS.autoConfigureConnectedAnchor = false;
-            jointS.connectedAnchor=swingPoint;
+            jointS.connectedAnchor = swingPoint;
             jointS.enablePreprocessing = false;
 
             float distanceFromPoint = Vector3.Distance(player.position, swingPoint);
 
-            // the distance grapple will try to keep from grapple point. 
+            // More reasonable joint settings
             jointS.maxDistance = distanceFromPoint * jointMaxDistance;
             jointS.minDistance = distanceFromPoint * jointMinDistance;
-
-            // customize values as you like
             jointS.spring = jointSpring;
             jointS.damper = jointDamper;
             jointS.massScale = jointMassScale;
+
+            // Setup line renderer
             lr.enabled = true;
             lr.positionCount = 2;
             currentGrapplePosition = gunTip.position;
+
+            Debug.Log("Starting swing with velocity: " + fragsurfVelocity + " magnitude: " + fragsurfVelocity.magnitude);
         }
     }
-    void DrawRope() {
-        if (!jointG&&!jointS) return;
+
+    void DrawRope()
+    {
+        if (!swinging || lr.positionCount < 2) return;
+
         lr.SetPosition(0, gunTip.position);
         lr.SetPosition(1, swingPoint);
         currentGrapplePosition = Vector3.Lerp(currentGrapplePosition, swingPoint, Time.deltaTime * 8f);
     }
+
     private void StopSwing()
     {
-        Rigidbody rb = player.gameObject.GetComponent<Rigidbody>();
-        Vector3 tangentDir = (player.position - swingPoint).normalized;
-        Vector3 exitVel = rb.GetPointVelocity(player.position);
+        if (!swinging) return;
 
+        Rigidbody rb = GetPlayerRigidbody();
+        if (rb == null) return;
+
+        Vector3 exitVelocity = rb.linearVelocity;
+
+        // Clean up spring joint
         if (jointS != null)
         {
             Destroy(jointS);
             jointS = null;
         }
-        Debug.Log("Swing exit velocity magn: " + rb.linearVelocity.magnitude);
-        Debug.Log("Swing exit velocity: " + rb.linearVelocity);
 
-
+        // Clean up line renderer
         lr.positionCount = 0;
-        mvmt.enabled = false;
-        //mvmt.moveData.velocity = rb.linearVelocity;
-        //mvmt.moveData.origin = player.position;
-        //mvmt.enabled = true;
-        //rb.linearVelocity += (player.position - swingPoint).normalized * 8f;
-        StartCoroutine(ReenableFragsurfAfterSwing(exitVel));
-        //StartCoroutine(ReenableKinematic(0.3f));
+        lr.enabled = false;
 
+        swinging = false;
+
+        Debug.Log("Swing exit velocity: " + exitVelocity + " magnitude: " + exitVelocity.magnitude);
+
+        // Transition back to Fragsurf movement
+        StartCoroutine(ReenableFragsurfAfterSwing(exitVelocity));
     }
-    /*IEnumerator ReenableKinematic(float delay)
-    {
-        yield return new WaitForSeconds(delay);
 
-        // Optional: only reenable if grounded or speed is low
-        Rigidbody rb = player.gameObject.GetComponent<Rigidbody>();
-        if (mvmt.enabled)
-        {
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-            rb.isKinematic = true;
-            rb.useGravity = false;
-        }
-    }*/
     IEnumerator ReenableFragsurfAfterSwing(Vector3 carryOverVelocity)
     {
-        yield return new WaitForFixedUpdate(); // Wait one physics frame
-        //yield return new WaitForSeconds(0.05f); // Helps avoid snapping
+        // Wait a physics frame to ensure clean transition
+        yield return new WaitForFixedUpdate();
 
-        Rigidbody rb = player.gameObject.GetComponent<Rigidbody>();
-        rb.isKinematic = true;
-        rb.useGravity = false;
+        Rigidbody rb = GetPlayerRigidbody();
+        if (rb != null)
+        {
+            // Restore rigidbody state
+            rb.isKinematic = wasKinematic;
+            rb.useGravity = wasUsingGravity;
+        }
+
+        // Re-enable Fragsurf movement
         mvmt.enabled = true;
         mvmt.grappling = false;
 
-        // Wait a single frame so Fragsurf doesn't glitch
+        // Wait one more frame for Fragsurf to initialize
         yield return null;
-        Debug.Log("Velocity before: " + carryOverVelocity);
-        mvmt.moveData.velocity = carryOverVelocity;
-        Debug.Log("Velocity after: " + mvmt.moveData.velocity);
 
+        // Apply carried velocity with some damping to prevent extreme speeds
+        Vector3 dampedVelocity = carryOverVelocity;
+
+        // Limit horizontal velocity to prevent uncontrollable sliding
+        Vector3 horizontalVel = new Vector3(dampedVelocity.x, 0, dampedVelocity.z);
+        if (horizontalVel.magnitude > 25f) // Adjust this limit as needed
+        {
+            horizontalVel = horizontalVel.normalized * 25f;
+            dampedVelocity = new Vector3(horizontalVel.x, dampedVelocity.y, horizontalVel.z);
+        }
+
+        mvmt.moveData.velocity = dampedVelocity;
+        Debug.Log("Final velocity applied: " + mvmt.moveData.velocity);
     }
-    private void StartGrapple() {
-        if (grapplingCdTimer > 0) {
+
+    private void StartGrapple()
+    {
+        if (grapplingCdTimer > 0)
+        {
             return;
         }
+
+        // Don't start grapple if already swinging
+        if (swinging)
+        {
+            return;
+        }
+
+        // Store current velocity before any modifications
+        preGrappleVelocity = mvmt.moveData.velocity;
+
         grappling = true;
         RaycastHit hit;
         if (Physics.Raycast(cam.position, cam.forward, out hit, maxGrappleDistance, grappleable))
         {
-            mvmt.frozen = true;
             grapplePoint = hit.point;
+
+            // Check if player is grounded - if so, don't freeze them completely
+            bool isGrounded = mvmt.moveData.velocity.y > -0.1f && mvmt.moveData.velocity.y < 0.1f;
+
+            if (!isGrounded)
+            {
+                // For air grapples, freeze movement for windup
+                mvmt.frozen = true;
+            }
+            else
+            {
+                // For grounded grapples, just reduce movement but don't freeze
+                mvmt.moveData.velocity *= 0.5f; // Reduce momentum but don't eliminate it
+            }
+
+            // Setup line renderer for grapple
+            lr.enabled = true;
+            lr.positionCount = 2;
+            lr.SetPosition(0, gunTip.position);
+            lr.SetPosition(1, grapplePoint);
+
             Invoke(nameof(ExecuteGrapple), grappleDelay);
         }
-        else {
+        else
+        {
+            // No valid target found
             grapplePoint = cam.position + cam.forward * maxGrappleDistance;
+
+            // Setup line renderer for failed grapple
+            lr.enabled = true;
+            lr.positionCount = 2;
+            lr.SetPosition(0, gunTip.position);
+            lr.SetPosition(1, grapplePoint);
+
             Invoke(nameof(StopGrapple), grappleDelay);
         }
-
-        lr.enabled = true;
-        lr.SetPosition(1, grapplePoint);
     }
+
     private void ExecuteGrapple()
     {
         mvmt.frozen = false;
 
-        Vector3 lowestPoint = new Vector3(transform.position.x, transform.position.y - 1f, transform.position.z);
+        Vector3 playerPos = transform.position;
+        float grapplePointRelativeYPos = grapplePoint.y - playerPos.y;
 
-        float grapplePointRelativeYPos = grapplePoint.y - lowestPoint.y;
-        float highestPointOnArc = grapplePointRelativeYPos + overshootY;
+        // Check if this is a grounded grapple (horizontal or slightly upward)
+        // Use a more reliable detection based on the actual Y difference
+        bool isGroundedGrapple = Physics.CheckSphere(groundCheckPoint.position, groundCheckRadius, groundLayer); // Increased threshold
 
-        if (grapplePointRelativeYPos < 0) highestPointOnArc = overshootY;
+        Debug.Log($"Grapple point Y difference: {grapplePointRelativeYPos}, IsGrounded: {isGroundedGrapple}");
+        Debug.Log($"Pre-grapple velocity: {preGrappleVelocity}");
 
-        mvmt._controller.JumpToPosition(grapplePoint, highestPointOnArc);
+        if (isGroundedGrapple)
+        {
+            Debug.Log("Executing GROUNDED grapple");
+
+            // For grounded grapples, manually apply momentum instead of using JumpToPosition
+            Vector3 directionToGrapple = (grapplePoint - playerPos).normalized;
+            Vector3 horizontalDirection = new Vector3(directionToGrapple.x, 0, directionToGrapple.z).normalized;
+
+            // Use much stronger force for grounded grapples
+            float actualGroundedForce = groundedGrappleForce * 2f; // Double the force
+
+            // Combine existing horizontal velocity with grapple momentum
+            Vector3 launchDirection = Quaternion.AngleAxis(45f, Vector3.Cross(horizontalDirection, Vector3.up)) * horizontalDirection;
+
+
+            // Add upward boost based on grapple angle
+            // float upwardBoost = Mathf.Max(5f, grapplePointRelativeYPos * 2f);
+
+            // Apply the new velocity directly
+            Vector3 finalVelocity = launchDirection * actualGroundedForce;
+            mvmt.moveData.grounded = false;
+            mvmt.moveData.velocity = finalVelocity;
+
+            Debug.Log($"Applied grounded grapple velocity: {finalVelocity} (magnitude: {finalVelocity.magnitude})");
+        }
+        else
+        {
+            Debug.Log("Executing AIR grapple");
+
+            // For air grapples, calculate proper trajectory
+            Vector3 directionToGrapple = (grapplePoint - playerPos).normalized;
+            float distance = Vector3.Distance(playerPos, grapplePoint);
+
+            // Use a simpler, more reliable calculation
+            float horizontalForce = 20f; // Base horizontal force
+            float verticalForce = 15f; // Base vertical force
+
+            // If grappling upward, increase vertical force
+            if (grapplePointRelativeYPos > 0)
+            {
+                verticalForce += grapplePointRelativeYPos * 2f;
+            }
+
+            Vector3 horizontalVel = new Vector3(directionToGrapple.x, 0, directionToGrapple.z) * horizontalForce;
+            Vector3 finalVelocity = new Vector3(horizontalVel.x, verticalForce, horizontalVel.z);
+
+            mvmt.moveData.velocity = finalVelocity;
+            Debug.Log($"Applied air grapple velocity: {finalVelocity} (magnitude: {finalVelocity.magnitude})");
+        }
 
         Invoke(nameof(StopGrapple), 1f);
-
     }
+
     private void StopGrapple()
     {
         mvmt.frozen = false;
         grappling = false;
         grapplingCdTimer = grapplingCd;
         lr.enabled = false;
+        lr.positionCount = 0;
     }
-
-
 }

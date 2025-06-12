@@ -5850,12 +5850,13 @@ MonoBehaviour:
   maxGrappleDistance: 25
   overshootY: 3
   grappleDelay: 0.1
+  groundedGrappleForce: 25
   maxSwingDistance: 25
-  jointMaxDistance: 0.8
-  jointMinDistance: 0.25
-  jointSpring: 20
-  jointDamper: 3
-  jointMassScale: 8
+  jointMaxDistance: 0.9
+  jointMinDistance: 0.1
+  jointSpring: 15
+  jointDamper: 5
+  jointMassScale: 1
   grapplingCd: 0.25
   grappleKey: 325
   swingKey: 324
