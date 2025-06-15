@@ -19,17 +19,17 @@ public class GrapplingHook : MonoBehaviour
     [SerializeField] float maxGrappleDistance;
     [SerializeField] float overshootY;
     [SerializeField] float grappleDelay;
-    [SerializeField] float groundedGrappleForce = 25f; // Increased from 15f
+    [SerializeField] float groundedGrappleForce = 25f;
 
     [Header("Swinging")]
     [SerializeField] float maxSwingDistance;
     private Vector3 swingPoint;
     private SpringJoint jointG, jointS;
-    [SerializeField] float jointMaxDistance = 0.9f; // Reduced from 0.8
-    [SerializeField] float jointMinDistance = 0.1f; // Reduced from 0.25
-    [SerializeField] float jointSpring = 15f; // Reduced from 20
-    [SerializeField] float jointDamper = 5f; // Increased from 3
-    [SerializeField] float jointMassScale = 1f; // Drastically reduced from 8
+    [SerializeField] float jointMaxDistance = 0.9f;
+    [SerializeField] float jointMinDistance = 0.1f;
+    [SerializeField] float jointSpring = 15f;
+    [SerializeField] float jointDamper = 5f;
+    [SerializeField] float jointMassScale = 1f; 
     private Vector3 currentGrapplePosition;
 
     [SerializeField] private LayerMask groundLayer;
@@ -51,12 +51,11 @@ public class GrapplingHook : MonoBehaviour
     private Rigidbody playerRb;
     private bool wasKinematic;
     private bool wasUsingGravity;
-    private Vector3 preGrappleVelocity; // Store velocity before grapple
+    private Vector3 preGrappleVelocity;
 
     void Start()
     {
-        // Don't get the rigidbody here - it might not exist yet
-        // We'll get it when we need it
+
     }
 
     // Helper method to safely get the rigidbody
