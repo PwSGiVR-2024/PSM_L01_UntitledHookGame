@@ -10,7 +10,7 @@ public class DroneController : MonoBehaviour
     [SerializeField] float hoverFrequency = 1f;
 
     [Header("Laser Attack")]
-    [SerializeField] float chargeTime = 1.0f;         // Charging time before firing
+    [SerializeField] float chargeTime = 0.5f;         // Charging time before firing
     [SerializeField] float laserCooldown = 3f;        // Time between shots
     [SerializeField] float laserRange = 100f;
     [SerializeField] LayerMask hitMask;
@@ -86,14 +86,17 @@ public class DroneController : MonoBehaviour
         {
             hitPoint = hit.point;
             Debug.Log("Laser hit: " + hit.collider.name);
-            // TODO: Damage logic here
+            ITimeDamageable damageable = hit.collider.GetComponent<ITimeDamageable>();
+            if (damageable != null)
+            {
+                damageable.TakeDamage(5f);
+            }
         }
         else
         {
             Debug.Log("Laser missed.");
         }
 
-        // Draw the laser
         StartCoroutine(ShowLaserBeam(transform.position, hitPoint));
 
         lastFireTime = Time.time;
