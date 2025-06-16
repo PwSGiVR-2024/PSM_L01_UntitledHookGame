@@ -1,0 +1,8 @@
+.pulse {
+    background-color: white;
+    height: 4px;
+    width: 0px; /* We'll animate this from C# */
+    margin-top: 50px;
+    margin-left: 10px;
+    unity-background-image-scale-mode: scale-to-fit;
+}
