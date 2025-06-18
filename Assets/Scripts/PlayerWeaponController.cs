@@ -4,9 +4,9 @@ using UnityEngine.InputSystem.LowLevel;
 
 public class PlayerWeaponController : MonoBehaviour
 {
-    [SerializeField] private Transform weaponHolder;
+    [SerializeField] Transform weaponHolder;
 
-    private IWeapon currentWeapon;
+    IWeapon currentWeapon;
     public KeyCode fireKey = KeyCode.Mouse0;
     public KeyCode reloadKey = KeyCode.R;
 

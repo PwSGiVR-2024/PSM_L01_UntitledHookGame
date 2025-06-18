@@ -3,11 +3,12 @@ using UnityEngine;
 [RequireComponent(typeof(DroneAttack))]
 public class DroneController : MonoBehaviour
 {
-    [SerializeField] private Transform player;
-    [SerializeField] private float moveSpeed = 3f;
-    [SerializeField] private float rotationSpeed = 5f;
-    [SerializeField] private float hoverAmplitude = 0.5f;
-    [SerializeField] private float hoverFrequency = 1f;
+    [SerializeField] Transform player;
+    [SerializeField] Rigidbody rb;
+    [SerializeField] float moveSpeed = 3f;
+    [SerializeField] float rotationSpeed = 5f;
+    [SerializeField] float hoverAmplitude = 0.5f;
+    [SerializeField] float hoverFrequency = 1f;
 
     private IEnemyAttack laserAttack;
 
@@ -40,8 +41,11 @@ public class DroneController : MonoBehaviour
     private void MoveAndRotate()
     {
         Vector3 direction = (player.position - transform.position).normalized;
+
         Quaternion lookRotation = Quaternion.LookRotation(direction);
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
-        transform.position = Vector3.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime);
+
+        Vector3 targetPos = transform.position + direction * moveSpeed * Time.deltaTime;
+        rb.MovePosition(targetPos);  // respects collisions
     }
 }

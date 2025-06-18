@@ -2,14 +2,14 @@ using UnityEngine;
 
 public class DroneAttack : MonoBehaviour, IEnemyAttack
 {
-    [SerializeField] private float chargeTime = 0.5f;
-    [SerializeField] private float laserCooldown = 3f;
-    [SerializeField] private float laserRange = 100f;
-    [SerializeField] private float laserDuration = 0.1f;
-    [SerializeField] private float laserDamage = 5f;
-    [SerializeField] private LayerMask hitMask;
-    [SerializeField] private LineRenderer laserBeam;
-    [SerializeField] private ParticleSystem chargeEffect;
+    [SerializeField] float chargeTime = 0.5f;
+    [SerializeField] float laserCooldown = 3f;
+    [SerializeField] float laserRange = 100f;
+    [SerializeField] float laserDuration = 0.1f;
+    [SerializeField] float laserDamage = 5f;
+    [SerializeField] LayerMask hitMask;
+    [SerializeField] LineRenderer laserBeam;
+    [SerializeField] ParticleSystem chargeEffect;
 
     private float lastFireTime;
     private Transform player;

@@ -736,7 +736,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4ec2f3c2b6840db47878f8eae5ade0d4, type: 2}
+  - {fileID: 2100000, guid: 2215636280ea227409864e6a32ccaf4b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1670,12 +1670,18 @@ MonoBehaviour:
   maxGrappleDistance: 25
   overshootY: 3
   grappleDelay: 0.1
+  groundedGrappleForce: 25
   maxSwingDistance: 25
   jointMaxDistance: 0.8
   jointMinDistance: 0.25
   jointSpring: 20
   jointDamper: 3
   jointMassScale: 8
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  groundCheckRadius: 0.3
+  groundCheckPoint: {fileID: 0}
   grapplingCd: 0.25
   grappleKey: 325
   swingKey: 324
