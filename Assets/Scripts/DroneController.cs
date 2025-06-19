@@ -46,6 +46,6 @@ public class DroneController : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
 
         Vector3 targetPos = transform.position + direction * moveSpeed * Time.deltaTime;
-        rb.MovePosition(targetPos);  // respects collisions
+        rb.MovePosition(targetPos);
     }
 }
