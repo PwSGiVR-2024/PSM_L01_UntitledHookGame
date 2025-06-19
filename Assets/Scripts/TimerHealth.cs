@@ -30,6 +30,7 @@ public class TimerHealth : MonoBehaviour
         if (IsDead)
         {
             OnTimeDepleted?.Invoke();
+            gameObject.SetActive(false);
         }
     }
 

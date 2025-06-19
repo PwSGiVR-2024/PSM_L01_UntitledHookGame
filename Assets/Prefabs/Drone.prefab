@@ -9824,11 +9824,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8812b7e65d93da641b18e8833720e4be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chargeTime: 0.2
-  laserCooldown: 3
+  chargeTime: 0.4
+  laserCooldown: 4
   laserRange: 100
   laserDuration: 0.1
-  laserDamage: 5
+  laserDamage: 3
   hitMask:
     serializedVersion: 2
     m_Bits: 65
