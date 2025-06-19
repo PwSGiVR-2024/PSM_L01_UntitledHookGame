@@ -14,6 +14,8 @@ public class GrapplingHook : MonoBehaviour
     [SerializeField] Transform gunTip;
     [SerializeField] LayerMask grappleable;
     [SerializeField] LineRenderer lr;
+    [SerializeField] AudioSource grappleAudio;
+
 
     [Header("Grappling")]
     [SerializeField] float maxGrappleDistance;
@@ -245,6 +247,7 @@ public class GrapplingHook : MonoBehaviour
         preGrappleVelocity = mvmt.moveData.velocity;
 
         grappling = true;
+        grappleAudio.Play();
         RaycastHit hit;
         if (Physics.Raycast(cam.position, cam.forward, out hit, maxGrappleDistance, grappleable))
         {
@@ -289,6 +292,11 @@ public class GrapplingHook : MonoBehaviour
 
     private void ExecuteGrapple()
     {
+        if (grapplingCdTimer > 0)
+        {
+            return;
+        }
+        grapplingCdTimer = grapplingCd;
         mvmt.frozen = false;
 
         Vector3 playerPos = transform.position;

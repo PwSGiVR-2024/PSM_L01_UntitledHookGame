@@ -23,29 +23,21 @@ public class DroneController : MonoBehaviour
         laserAttack = GetComponent<IEnemyAttack>();
     }
 
-    private void Update()
+
+    private void FixedUpdate()
     {
         if (player == null) return;
 
-        Hover();
-        MoveAndRotate();
+        Vector3 hoverOffset = Vector3.up * Mathf.Sin(Time.time * hoverFrequency) * hoverAmplitude;
+
+        Vector3 direction = (player.position - rb.position).normalized;
+        Quaternion lookRotation = Quaternion.LookRotation(direction);
+        rb.MoveRotation(Quaternion.Slerp(rb.rotation, lookRotation, rotationSpeed * Time.fixedDeltaTime));
+
+        Vector3 targetPosition = rb.position + direction * moveSpeed * Time.fixedDeltaTime + hoverOffset * Time.fixedDeltaTime;
+        rb.MovePosition(targetPosition);
+
         laserAttack.TryAttack();
     }
 
-    private void Hover()
-    {
-        float hoverOffset = Mathf.Sin(Time.time * hoverFrequency) * hoverAmplitude;
-        transform.position += Vector3.up * hoverOffset * Time.deltaTime;
-    }
-
-    private void MoveAndRotate()
-    {
-        Vector3 direction = (player.position - transform.position).normalized;
-
-        Quaternion lookRotation = Quaternion.LookRotation(direction);
-        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
-
-        Vector3 targetPos = transform.position + direction * moveSpeed * Time.deltaTime;
-        rb.MovePosition(targetPos);
-    }
 }

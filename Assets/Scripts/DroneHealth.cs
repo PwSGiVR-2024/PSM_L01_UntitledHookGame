@@ -5,10 +5,11 @@ public class DroneHealth : MonoBehaviour, IDamageable
 {
     [SerializeField] float maxHealth = 3f;
     [SerializeField] float timeGained = 5f;
+    [SerializeField] ParticleSystem deathExplosion;
+    [SerializeField] float deathDelay = 1f; // Time to wait before destroying the GameObject
+
     private bool isDead = false;
-
     private UnityAction<float> cachedListener;
-
     private float currentHealth;
 
     private void Start()
@@ -21,7 +22,6 @@ public class DroneHealth : MonoBehaviour, IDamageable
         {
             cachedListener = receiver.ModifyTime;
         }
-
     }
 
     public void TakeDamage(float amount)
@@ -38,11 +38,26 @@ public class DroneHealth : MonoBehaviour, IDamageable
     {
         if (isDead) return;
         isDead = true;
-        if (cachedListener != null)
+
+        cachedListener?.Invoke(timeGained);
+
+        if (deathExplosion != null)
         {
-            cachedListener.Invoke(timeGained);
+            deathExplosion.transform.parent = null;
+            deathExplosion.Play();
+            Destroy(deathExplosion.gameObject, deathExplosion.main.duration + deathExplosion.main.startLifetime.constantMax);
         }
 
-        Destroy(gameObject);
+        DisableDroneComponents();
+
+        Destroy(gameObject, deathDelay);
+    }
+
+    private void DisableDroneComponents()
+    {
+        foreach (var c in GetComponentsInChildren<Collider>()) c.enabled = false;
+        foreach (var r in GetComponentsInChildren<Renderer>()) r.enabled = false;
+        var ai = GetComponent<DroneController>();
+        if (ai != null) ai.enabled = false;
     }
 }

@@ -12,6 +12,7 @@ public class DroneAttack : MonoBehaviour, IEnemyAttack
     [SerializeField] LineRenderer laserBeam;
     [SerializeField] ParticleSystem chargeEffect;
     private UnityAction<float> cachedListener;
+    [SerializeField] AudioSource laserAudio;
 
     private float lastFireTime;
     private GameObject player;
@@ -71,6 +72,7 @@ public class DroneAttack : MonoBehaviour, IEnemyAttack
         laserBeam.SetPosition(0, start);
         laserBeam.SetPosition(1, end);
         laserBeam.enabled = true;
+        laserAudio.Play();
         yield return new WaitForSeconds(laserDuration);
         laserBeam.enabled = false;
     }

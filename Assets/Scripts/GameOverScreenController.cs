@@ -15,7 +15,7 @@ public class GameOverScreenController : MonoBehaviour
         float time = timerHealth.totalTime;
         int minutes = Mathf.FloorToInt(time / 60f);
         int seconds = Mathf.FloorToInt(time % 60f);
-        timeSurvivedText.text = $"You survived {minutes:00}:{seconds:00}";
+        timeSurvivedText.text = $"You survived  {minutes:00} : {seconds:00}";
         gameOver.SetActive(true);
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
