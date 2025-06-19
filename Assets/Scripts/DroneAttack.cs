@@ -1,25 +1,33 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class DroneAttack : MonoBehaviour, IEnemyAttack
 {
-    [SerializeField] float chargeTime = 0.5f;
+    [SerializeField] float chargeTime = 0.2f;
     [SerializeField] float laserCooldown = 3f;
     [SerializeField] float laserRange = 100f;
     [SerializeField] float laserDuration = 0.1f;
-    [SerializeField] float laserDamage = 5f;
+    [SerializeField] float laserDamage = 10f;
     [SerializeField] LayerMask hitMask;
     [SerializeField] LineRenderer laserBeam;
     [SerializeField] ParticleSystem chargeEffect;
+    private UnityAction<float> cachedListener;
 
     private float lastFireTime;
-    private Transform player;
+    private GameObject player;
     private Vector3 lastKnownPlayerPos;
     private bool isCharging;
+    private int playerLayer = LayerMask.NameToLayer("Player");
 
     private void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        player = GameObject.FindGameObjectWithTag("Player");
         laserBeam.enabled = false;
+        var receiver = player?.GetComponent<TimerHealth>();
+        if (receiver != null)
+        {
+            cachedListener = receiver.ModifyTime;
+        }
     }
 
     public void TryAttack()
@@ -27,7 +35,7 @@ public class DroneAttack : MonoBehaviour, IEnemyAttack
         if (player == null || isCharging || Time.time - lastFireTime < laserCooldown)
             return;
 
-        lastKnownPlayerPos = player.position;
+        lastKnownPlayerPos = player.transform.position;
         StartCoroutine(FireLaserWithDelay());
     }
 
@@ -45,9 +53,10 @@ public class DroneAttack : MonoBehaviour, IEnemyAttack
         if (Physics.Raycast(transform.position, fireDirection, out RaycastHit hit, laserRange, hitMask))
         {
             hitPoint = hit.point;
-            if (hit.collider.TryGetComponent(out ITimeDamageable damageable))
+            if (hit.collider.gameObject.layer == playerLayer && cachedListener != null)
             {
-                damageable.TakeDamage(laserDamage);
+                Debug.Log("Laser hit the player.");
+                cachedListener.Invoke(-laserDamage);
             }
         }
 

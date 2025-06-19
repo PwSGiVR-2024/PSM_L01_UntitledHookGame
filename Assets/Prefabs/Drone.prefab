@@ -9824,7 +9824,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8812b7e65d93da641b18e8833720e4be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chargeTime: 0.5
+  chargeTime: 0.2
   laserCooldown: 3
   laserRange: 100
   laserDuration: 0.1
@@ -9954,6 +9954,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 2
+  timeGained: 5
 --- !u!135 &6458643406460170050
 SphereCollider:
   m_ObjectHideFlags: 0
