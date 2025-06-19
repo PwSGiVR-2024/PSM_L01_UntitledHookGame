@@ -7,9 +7,11 @@ public class GameOverScreenController : MonoBehaviour
     [SerializeField] private TimerHealth timerHealth;
     [SerializeField] private TextMeshProUGUI timeSurvivedText;
     [SerializeField] private GameObject gameOver;
+    [SerializeField] private GameObject player;
 
     public void ShowGameOverScreen()
     {
+        player.SetActive(false);
         float time = timerHealth.totalTime;
         int minutes = Mathf.FloorToInt(time / 60f);
         int seconds = Mathf.FloorToInt(time % 60f);

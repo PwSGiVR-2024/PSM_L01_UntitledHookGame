@@ -17,10 +17,11 @@ public class DroneAttack : MonoBehaviour, IEnemyAttack
     private GameObject player;
     private Vector3 lastKnownPlayerPos;
     private bool isCharging;
-    private int playerLayer = LayerMask.NameToLayer("Player");
+    private int playerLayer;
 
     private void Start()
     {
+        playerLayer = LayerMask.NameToLayer("Player");
         player = GameObject.FindGameObjectWithTag("Player");
         laserBeam.enabled = false;
         var receiver = player?.GetComponent<TimerHealth>();

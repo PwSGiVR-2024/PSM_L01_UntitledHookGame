@@ -18,13 +18,14 @@ public class Shotgun : MonoBehaviour, IWeapon, IReloadable
 
     private int currentAmmo;
     private bool isReloading;
-    [SerializeField] LayerMask enemyLayer = LayerMask.GetMask("Enemy");
+    [SerializeField] LayerMask enemyLayer;
 
     public int CurrentAmmo => currentAmmo;
     public int MaxAmmo => maxAmmo;
 
     private void Start()
     {
+        enemyLayer = LayerMask.GetMask("Enemy");
         currentAmmo = maxAmmo;
     }
 
