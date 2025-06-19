@@ -1,74 +1,125 @@
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Audio;
-using System.Linq;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Audio;
+using UnityEngine.UI;
 using TMPro;
 
-public class OptionsMenuController : MonoBehaviour
+public class OptionsController : MonoBehaviour
 {
-    [SerializeField] private AudioMixer audioMixer;
-    [SerializeField] private Slider volumeSlider;
+    [Header("UI Components")]
     [SerializeField] private TMP_Dropdown resolutionDropdown;
-    [SerializeField] private TMP_Dropdown displayModeDropdown;
+    //[SerializeField] private TMP_Dropdown fullscreenDropdown;
+    [SerializeField] private Slider volumeSlider;
+
+    [Header("Audio")]
+    [SerializeField] private AudioMixer audioMixer;
+    private const string VolumeKey = "MasterVolume";
 
     private Resolution[] resolutions;
 
-    private const string VolumeKey = "MasterVolume";
-    private const string ResolutionKey = "ResolutionIndex";
-    private const string DisplayModeKey = "DisplayMode"; // 0 = Fullscreen, 1 = Borderless
-
-    void Start()
+    private void Start()
     {
-        resolutions = Screen.resolutions
-            .Where(r => Mathf.Approximately((float)r.width / r.height, 16f / 9f))
-            .Distinct()
-            .ToArray();
+        SetupVolume();
+        SetupResolutions();
+    }
 
-        resolutionDropdown.ClearOptions();
-        List<string> options = resolutions.Select(r => $"{r.width} x {r.height}").ToList();
-        resolutionDropdown.AddOptions(options);
-
-        int savedResolution = PlayerPrefs.GetInt(ResolutionKey, resolutions.Length - 1);
-        resolutionDropdown.value = Mathf.Clamp(savedResolution, 0, resolutions.Length - 1);
-        resolutionDropdown.RefreshShownValue();
-        SetResolution(resolutionDropdown.value);
-
-        displayModeDropdown.ClearOptions();
-        displayModeDropdown.AddOptions(new List<string> { "Fullscreen", "Borderless" });
-        int savedDisplayMode = PlayerPrefs.GetInt(DisplayModeKey, 0);
-        displayModeDropdown.value = Mathf.Clamp(savedDisplayMode, 0, 1);
-        displayModeDropdown.RefreshShownValue();
-        SetDisplayMode(savedDisplayMode);
-
+    private void SetupVolume()
+    {
         float savedVolume = PlayerPrefs.GetFloat(VolumeKey, 1f);
         volumeSlider.value = savedVolume;
         SetVolume(savedVolume);
+        volumeSlider.onValueChanged.AddListener(SetVolume);
     }
 
     public void SetVolume(float value)
     {
-        float dB = Mathf.Log10(Mathf.Max(value, 0.0001f)) * 20f;
+        float dB = value <= 0.001f ? -80f : Mathf.Log10(value) * 20f;
         audioMixer.SetFloat("MasterVolume", dB);
         PlayerPrefs.SetFloat(VolumeKey, value);
     }
 
+    private void SetupResolutions()
+    {
+        resolutions = Screen.resolutions;
+        resolutionDropdown.ClearOptions();
+
+        List<string> options = new List<string>();
+        int currentResIndex = 0;
+
+        for (int i = 0; i < resolutions.Length; i++)
+        {
+            string option = $"{resolutions[i].width} x {resolutions[i].height}";
+            options.Add(option);
+
+            if (resolutions[i].width == Screen.currentResolution.width &&
+                resolutions[i].height == Screen.currentResolution.height)
+            {
+                currentResIndex = i;
+            }
+        }
+
+        resolutionDropdown.AddOptions(options);
+
+        int savedIndex = PlayerPrefs.GetInt("ResolutionIndex", currentResIndex);
+        resolutionDropdown.value = savedIndex;
+        resolutionDropdown.RefreshShownValue();
+
+        SetResolution(savedIndex);
+        resolutionDropdown.onValueChanged.AddListener(SetResolution);
+    }
+
     public void SetResolution(int index)
     {
-        if (index < 0 || index >= resolutions.Length) return;
-
-        Resolution res = resolutions[index];
-        FullScreenMode currentMode = Screen.fullScreenMode;
-        Screen.SetResolution(res.width, res.height, currentMode);
-        PlayerPrefs.SetInt(ResolutionKey, index);
+        if (index >= 0 && index < resolutions.Length)
+        {
+            Resolution res = resolutions[index];
+            Screen.SetResolution(res.width, res.height, Screen.fullScreenMode);
+            PlayerPrefs.SetInt("ResolutionIndex", index);
+        }
     }
 
-    public void SetDisplayMode(int index)
+    /*private void SetupFullscreenDropdown()
     {
-        FullScreenMode mode = index == 0 ? FullScreenMode.FullScreenWindow : FullScreenMode.MaximizedWindow;
-        Resolution res = resolutions[resolutionDropdown.value];
-        Screen.SetResolution(res.width, res.height, mode);
-        Screen.fullScreenMode = mode;
-        PlayerPrefs.SetInt(DisplayModeKey, index);
+        fullscreenDropdown.ClearOptions();
+        fullscreenDropdown.AddOptions(new List<string> { "Fullscreen", "Borderless", "Windowed" });
+
+        FullScreenMode currentMode = Screen.fullScreenMode;
+        int currentModeIndex = ModeToIndex(currentMode);
+
+        int savedIndex = PlayerPrefs.GetInt("FullscreenMode", currentModeIndex);
+        fullscreenDropdown.value = savedIndex;
+        fullscreenDropdown.RefreshShownValue();
+
+        SetFullscreenMode(savedIndex);
+        fullscreenDropdown.onValueChanged.AddListener(SetFullscreenMode);
     }
+
+    public void SetFullscreenMode(int index)
+    {
+        FullScreenMode mode = index switch
+        {
+            0 => FullScreenMode.ExclusiveFullScreen,
+            1 => FullScreenMode.FullScreenWindow,
+            2 => FullScreenMode.Windowed,
+            _ => FullScreenMode.Windowed
+        };
+
+        Screen.fullScreenMode = mode;
+        PlayerPrefs.SetInt("FullscreenMode", index);
+
+        SetResolution(resolutionDropdown.value);
+    }
+
+    private int ModeToIndex(FullScreenMode mode)
+    {
+        return mode switch
+        {
+            FullScreenMode.ExclusiveFullScreen => 0,
+            FullScreenMode.FullScreenWindow => 1,
+            FullScreenMode.Windowed => 2,
+            _ => 2
+        };
+    }
+    nie dziala :c
+    */
 }
